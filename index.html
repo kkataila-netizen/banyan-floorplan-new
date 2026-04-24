@@ -801,11 +801,13 @@ function handleMoveTarget(targetId){
   // Move person to target desk, free up source
   state.assignments[targetId]=srcAsgn;
   delete state.assignments[moveSource];
-  // Save everywhere and reload
+  // Save everywhere and force full refresh
   saveState();
   cancelMove();
   toast(`${srcAsgn.name} moved to desk ${targetId}`);
-  setTimeout(()=>location.reload(), 600);
+  setTimeout(()=>{
+    window.location.href = window.location.pathname + '?t=' + Date.now();
+  }, 600);
   return true;
 }
 

@@ -4,6 +4,17 @@
   functions = "netlify/functions"
   command = "echo 'Static site — no build needed'"
 
+# Prevent browser caching HTML/JS so deploys take effect immediately
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
 # Redirect /api/state to the serverless function — keeps frontend code unchanged
 [[redirects]]
   from = "/api/state"
