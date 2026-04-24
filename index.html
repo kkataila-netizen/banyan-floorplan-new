@@ -451,6 +451,8 @@ function saveState(){
       if(d) d.type = t==='hotel'?H:P;
     });
   }
+  // Timestamp for conflict resolution
+  state._ts = Date.now();
   // Save to localStorage (instant)
   try{localStorage.setItem(SK,JSON.stringify(state));}catch(e){}
   // Save to server file (async, fire-and-forget)
@@ -465,6 +467,8 @@ function saveState(){
 function loadFromServer(){
   fetch('/api/state').then(r=>r.json()).then(data=>{
     if(data && data.assignments){
+      // Don't overwrite if local state is newer (e.g. move just happened)
+      if(state._ts && data._ts && state._ts > data._ts) return;
       state=ensureState(data);
       // Restore desk type overrides
       if(state.deskTypes){
@@ -801,13 +805,12 @@ function handleMoveTarget(targetId){
   // Move person to target desk, free up source
   state.assignments[targetId]=srcAsgn;
   delete state.assignments[moveSource];
-  // Save everywhere and force full refresh
+  // Save and re-render immediately (no reload — avoids server race condition)
   saveState();
   cancelMove();
+  renderDesks();
+  renderCalPanel();
   toast(`${srcAsgn.name} moved to desk ${targetId}`);
-  setTimeout(()=>{
-    window.location.href = window.location.pathname + '?t=' + Date.now();
-  }, 600);
   return true;
 }
 
