@@ -801,21 +801,11 @@ function handleMoveTarget(targetId){
   // Move person to target desk, free up source
   state.assignments[targetId]=srcAsgn;
   delete state.assignments[moveSource];
-  // Save to localStorage immediately, then wait for server POST before reloading
-  try{localStorage.setItem(SK,JSON.stringify(state));}catch(e){}
-  fetch('/api/state',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(state)
-  }).then(()=>{
-    cancelMove();
-    toast(`${srcAsgn.name} moved to desk ${targetId}`);
-    setTimeout(()=>location.reload(), 600);
-  }).catch(()=>{
-    cancelMove();
-    toast(`${srcAsgn.name} moved to desk ${targetId}`);
-    setTimeout(()=>location.reload(), 600);
-  });
+  // Save everywhere and reload
+  saveState();
+  cancelMove();
+  toast(`${srcAsgn.name} moved to desk ${targetId}`);
+  setTimeout(()=>location.reload(), 600);
   return true;
 }
 
