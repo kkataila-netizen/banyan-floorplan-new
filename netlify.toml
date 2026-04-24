@@ -1,6 +1,8 @@
 [build]
+  base = "."
   publish = "."
   functions = "netlify/functions"
+  command = "echo 'Static site — no build needed'"
 
 # Redirect /api/state to the serverless function — keeps frontend code unchanged
 [[redirects]]
