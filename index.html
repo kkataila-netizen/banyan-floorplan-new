@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banyan — 2 Bloor West Floor Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --moss:#395542;--moss-d:#2d4535;--moss-l:#4a6e55;
+  --white:#fff;--charcoal:#414141;
+  --sky:#9BCBEB;--sky-d:#6ba8cf;
+  --gold:#F1BE48;--lgrey:#F2F2F2;--border:#e0e0e0;
+}
+body{font-family:'Source Sans 3','Source Sans Pro',sans-serif;font-weight:300;color:var(--charcoal);background:var(--lgrey);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* HEADER */
+.hdr{background:var(--moss);color:#fff;padding:0 20px;height:52px;display:flex;align-items:center;gap:14px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.hdr-logo{font-family:'Libre Franklin',sans-serif;font-weight:600;font-size:17px;letter-spacing:-.5px;line-height:1}
+.hdr-logo small{display:block;font-size:8px;font-weight:400;letter-spacing:2.5px;opacity:.65;text-transform:uppercase;margin-top:1px}
+.hdr-div{width:1px;height:26px;background:rgba(255,255,255,.25)}
+.hdr-title{font-family:'Libre Franklin',sans-serif;font-weight:400;font-size:14px;opacity:.88}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.search-wrap{display:flex;align-items:center;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:6px;padding:5px 10px;gap:7px}
+.search-wrap input{background:none;border:none;outline:none;color:#fff;font-family:'Source Sans 3',sans-serif;font-size:13px;width:170px}
+.search-wrap input::placeholder{color:rgba(255,255,255,.5)}
+
+/* TOOLBAR */
+.toolbar{background:#fff;border-bottom:1px solid var(--border);padding:7px 18px;display:flex;align-items:center;gap:18px;flex-shrink:0}
+.legend{display:flex;align-items:center;gap:14px;font-size:12px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:5px}
+.leg-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.leg-diamond{width:10px;height:10px;flex-shrink:0;transform:rotate(45deg);border-radius:1px}
+.tbar-right{margin-left:auto;display:flex;gap:7px}
+
+/* BUTTONS */
+.btn{font-family:'Source Sans 3',sans-serif;font-weight:600;font-size:12px;padding:5px 13px;border-radius:5px;border:none;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--moss);color:#fff}.btn-primary:hover{background:var(--moss-d)}
+.btn-secondary{background:transparent;color:var(--moss);border:1.5px solid var(--moss)}.btn-secondary:hover{background:var(--lgrey)}
+.btn-ghost{background:transparent;color:var(--charcoal);border:1.5px solid var(--border)}.btn-ghost:hover{background:var(--lgrey)}
+.btn-danger{background:transparent;color:#c0392b;border:1.5px solid #e57373}.btn-danger:hover{background:#ffeeed}
+.btn-sm{padding:4px 10px;font-size:11px}
+
+/* MAIN */
+.main{display:flex;flex:1;overflow:hidden}
+.fp-area{flex:1;overflow:auto;padding:16px;display:flex;align-items:flex-start;justify-content:center}
+.fp-wrap{background:#fff;border-radius:10px;box-shadow:0 2px 18px rgba(0,0,0,.09);overflow:hidden;max-width:1000px;width:100%;transform-origin:center top;transition:transform .15s ease}
+#fp-svg{width:100%;height:auto;display:block}
+.desk{cursor:pointer}
+.desk:hover .d-shape{filter:brightness(1.12)}
+body.move-mode .fp-area{cursor:crosshair}
+body.move-mode .desk{cursor:crosshair}
+.move-banner{position:fixed;top:52px;left:0;right:0;background:#F1BE48;color:#333;text-align:center;padding:8px 16px;font-weight:600;font-size:13px;z-index:50;display:none;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.move-banner .cancel-link{margin-left:12px;color:#7a5a00;cursor:pointer;text-decoration:underline}
+body.move-mode .move-banner{display:block}
+
+/* SIDEBAR */
+.sidebar{width:0;overflow:hidden;transition:width .22s ease;background:#fff;border-left:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column}
+.sidebar.open{width:310px}
+.sb-inner{width:310px;height:100%;overflow-y:auto;display:flex;flex-direction:column}
+.sb-hdr{padding:15px 18px;position:relative;flex-shrink:0}
+.sb-zone{font-size:10px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;opacity:.72;margin-bottom:3px}
+.sb-id{font-family:'Libre Franklin',sans-serif;font-weight:600;font-size:20px}
+.sb-type{font-size:11px;opacity:.75;margin-top:2px}
+.sb-close{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.2);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.sb-body{padding:16px;flex:1}
+
+/* OCCUPANT */
+.occ-card{background:var(--lgrey);border-radius:7px;padding:12px;display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.occ-av{width:40px;height:40px;border-radius:50%;background:var(--moss);color:#fff;font-family:'Libre Franklin',sans-serif;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.occ-av.empty{background:#bbb}
+.occ-av.exec{background:var(--moss-d)}
+.occ-name{font-family:'Libre Franklin',sans-serif;font-weight:600;font-size:14px}
+.occ-sub{font-size:11px;color:#888;margin-top:2px}
+.form-actions{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.form-actions .btn{flex:1}
+
+/* FORM */
+.fg{margin-bottom:12px}
+.flabel{font-size:11px;font-weight:600;color:var(--moss);letter-spacing:.5px;margin-bottom:4px;display:block}
+.finput{width:100%;padding:7px 9px;border:1.5px solid var(--border);border-radius:5px;font-family:'Source Sans 3',sans-serif;font-size:13px;color:var(--charcoal);outline:none;transition:border-color .15s}
+.finput:focus{border-color:var(--moss)}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.sec-title{font-family:'Libre Franklin',sans-serif;font-weight:600;font-size:12px;color:var(--charcoal);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+
+/* CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:14px}
+.cal-day{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;cursor:pointer;border:1.5px solid transparent;transition:all .13s;background:var(--lgrey)}
+.cal-day .dn{font-weight:600;font-size:12px;line-height:1.1}
+.cal-day .dd{font-size:8px;opacity:.65;text-transform:uppercase}
+.cal-day.avail{background:#eaf3ee;border-color:#9bbfa8}
+.cal-day.avail:hover{background:var(--moss);color:#fff;border-color:var(--moss-d)}
+.cal-day.booked{background:#fde8e8;border-color:#e8a0a0;cursor:default}
+.cal-day.booked-today{background:var(--sky);border-color:var(--sky-d);cursor:default}
+.cal-day.past{opacity:.38;cursor:default}
+.cal-day.weekend{opacity:.55}
+
+/* BOOKING LIST */
+.bk-list{display:flex;flex-direction:column;gap:5px}
+.bk-item{background:var(--lgrey);border-radius:5px;padding:7px 9px;display:flex;align-items:center;gap:8px;font-size:12px}
+.bk-date{font-weight:600;font-size:11px;min-width:46px;color:var(--moss)}
+.bk-name{flex:1;line-height:1.3}
+.bk-del{background:none;border:none;color:#aaa;cursor:pointer;font-size:15px;padding:0 2px;line-height:1}
+.bk-del:hover{color:#c0392b}
+.empty-st{text-align:center;padding:16px;color:#aaa;font-size:12px}
+
+/* RIGHT CALENDAR PANEL */
+.cal-panel{width:260px;flex-shrink:0;background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.cal-panel-hdr{padding:12px 14px 8px;font-family:'Libre Franklin',sans-serif;font-weight:600;font-size:13px;color:var(--moss);border-bottom:1px solid var(--border);flex-shrink:0}
+.cal-panel-body{flex:1;overflow-y:auto;padding:10px 14px 14px}
+.cp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:12px}
+.cp-day{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;cursor:pointer;border:1.5px solid transparent;transition:all .13s;background:var(--lgrey);position:relative}
+.cp-day .dd{font-size:7px;opacity:.6;text-transform:uppercase}
+.cp-day .dn{font-weight:600;font-size:11px;line-height:1.1}
+.cp-day.cp-today{background:#eaf3ee;border-color:var(--moss)}
+.cp-day.cp-has-bookings{background:#fff3d6;border-color:#e0c67a}
+.cp-day.cp-selected{background:var(--moss);color:#fff;border-color:var(--moss-d)}
+.cp-day.cp-selected .dd{opacity:.8}
+.cp-day.cp-weekend{opacity:.5}
+.cp-day:hover:not(.cp-selected){background:#e8e8e8}
+.cp-badge{position:absolute;top:-3px;right:-3px;background:var(--moss);color:#fff;font-size:7px;font-weight:700;min-width:13px;height:13px;border-radius:7px;display:flex;align-items:center;justify-content:center;line-height:1}
+.cp-day.cp-selected .cp-badge{background:var(--gold);color:#333}
+.cp-date-label{font-family:'Libre Franklin',sans-serif;font-weight:600;font-size:12px;color:var(--charcoal);margin-bottom:6px}
+.cp-booking{background:var(--lgrey);border-radius:5px;padding:7px 9px;margin-bottom:4px;font-size:11px;display:flex;align-items:center;gap:8px}
+.cp-booking .cp-desk-id{font-weight:700;color:var(--moss);min-width:32px}
+.cp-booking .cp-bk-name{flex:1;line-height:1.3}
+.cp-no-bookings{text-align:center;padding:18px 8px;color:#aaa;font-size:11px}
+.cp-summary{display:flex;gap:10px;margin-bottom:10px;font-size:11px;color:#666}
+.cp-summary span{font-weight:600;color:var(--moss)}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--charcoal);color:#fff;padding:9px 18px;border-radius:6px;font-size:13px;opacity:0;transition:all .25s;pointer-events:none;z-index:1000;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-ov.show{display:flex}
+.modal{background:#fff;border-radius:10px;padding:26px;width:360px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.modal-title{font-family:'Libre Franklin',sans-serif;font-weight:600;font-size:17px;margin-bottom:18px;color:var(--moss)}
+.modal-actions{display:flex;gap:9px;margin-top:18px;justify-content:flex-end}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-logo">banyan<small>SOFTWARE</small></div>
+  <div class="hdr-div"></div>
+  <div class="hdr-title">2 Bloor West — Seat Manager</div>
+  <div class="hdr-right">
+    <div class="search-wrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search-input" placeholder="Find a person…">
+    </div>
+  </div>
+</header>
+
+<div class="move-banner" id="move-banner">
+  🔀 Click a desk to move <span id="move-name"></span> there
+  <span class="cancel-link" onclick="cancelMove()">Cancel</span>
+</div>
+
+<div class="toolbar">
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:var(--moss)"></div><span>Assigned</span></div>
+    <div class="leg-item"><div class="leg-dot" style="background:#fff;border:2px solid var(--moss)"></div><span>Unassigned</span></div>
+    <div class="leg-item"><div class="leg-diamond" style="background:var(--sky);border:1.5px solid var(--sky-d)"></div><span>Hotel (available)</span></div>
+    <div class="leg-item"><div class="leg-diamond" style="background:var(--moss);border:1.5px solid var(--moss-d)"></div><span>Hotel (booked today)</span></div>
+  </div>
+  <div class="tbar-right">
+    <button class="btn btn-ghost btn-sm" onclick="exportData()">Export</button>
+    <button class="btn btn-secondary btn-sm" onclick="importData()">Import</button>
+    <button class="btn btn-danger btn-sm" onclick="resetToDefault()">Reset</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="fp-area">
+    <div class="fp-wrap">
+      <svg id="fp-svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" font-family="'Source Sans 3','Source Sans Pro',sans-serif">
+        <defs>
+          <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity=".10"/>
+          </filter>
+        </defs>
+
+        <!-- Clean floor plan — UPDATED FLOOR PLAN 17SEP2025 -->
+        <image href="floorplan-clean.png" x="0" y="0" width="1000" height="800" preserveAspectRatio="none"/>
+
+        <!-- ═══ DESKS (JS rendered) ═══ -->
+        <g id="desks-layer"></g>
+        <g id="highlight-layer"></g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- CALENDAR PANEL (always visible) -->
+  <div class="cal-panel" id="cal-panel">
+    <div class="cal-panel-hdr">Hotel Desk Bookings</div>
+    <div class="cal-panel-body">
+      <div id="cp-calendar"></div>
+      <div id="cp-detail"></div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-inner">
+      <div class="sb-hdr" id="sb-hdr">
+        <div class="sb-id" id="sb-id"></div>
+        <div class="sb-type" id="sb-type"></div>
+        <button class="sb-close" onclick="closeSidebar()">×</button>
+      </div>
+      <div class="sb-body" id="sb-body"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Assign Modal -->
+<div class="modal-ov" id="m-assign">
+  <div class="modal">
+    <div class="modal-title" id="m-assign-title">Assign Desk</div>
+    <div class="fg"><label class="flabel">Person's Name</label><input class="finput" id="a-name" placeholder="Full name"></div>
+    <div class="fg"><label class="flabel">Team / Department</label><input class="finput" id="a-team" placeholder="e.g. Finance, M&amp;A…"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-assign')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAssign()">Assign</button>
+    </div>
+  </div>
+</div>
+
+<!-- Book Modal -->
+<div class="modal-ov" id="m-book">
+  <div class="modal">
+    <div class="modal-title">Book Hotel Desk</div>
+    <div class="fg"><label class="flabel">Date</label><input class="finput" id="b-date" type="date"></div>
+    <div class="fg"><label class="flabel">Your Name</label><input class="finput" id="b-name" placeholder="Full name"></div>
+    <div class="fg"><label class="flabel">Team / Department</label><input class="finput" id="b-team" placeholder="e.g. Finance, M&amp;A…"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-book')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmBook()">Book Desk</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Zone kept as internal metadata for desk behaviour (EXEC = private office)
+// Not surfaced in the UI as a visual category
+
+// ═══════════════════════════════════════════════
+// DESK DEFINITIONS
+// x,y = SVG centre coords (1000×800 viewBox) | type = permanent | hotel
+// Coordinates mapped from floorplan-layout.png seat numbers
+// ═══════════════════════════════════════════════
+const H='hotel', P='permanent';
+
+const DESKS = [
+  // ── Finance: WS611 (001-011), WS612 (012-023), WS616 (024-032), 033 ──
+  {id:'001',zone:'FIN',type:H,x:509,y:690},{id:'002',zone:'FIN',type:P,x:510,y:727},
+  {id:'003',zone:'FIN',type:P,x:509,y:764},{id:'004',zone:'FIN',type:P,x:492,y:763},
+  {id:'005',zone:'FIN',type:H,x:491,y:728},{id:'006',zone:'FIN',type:H,x:490,y:691},
+  {id:'007',zone:'FIN',type:P,x:426,y:691},{id:'008',zone:'FIN',type:P,x:427,y:727},
+  {id:'009',zone:'FIN',type:P,x:427,y:763},{id:'010',zone:'FIN',type:P,x:409,y:728},
+  {id:'011',zone:'FIN',type:P,x:410,y:691},{id:'012',zone:'FIN',type:P,x:347,y:691},
+  {id:'013',zone:'FIN',type:P,x:347,y:729},{id:'014',zone:'FIN',type:P,x:346,y:764},
+  {id:'015',zone:'FIN',type:P,x:327,y:764},{id:'016',zone:'FIN',type:P,x:327,y:729},
+  {id:'017',zone:'FIN',type:P,x:326,y:691},{id:'018',zone:'FIN',type:P,x:268,y:692},
+  {id:'019',zone:'FIN',type:P,x:267,y:728},{id:'020',zone:'FIN',type:P,x:267,y:763},
+  {id:'021',zone:'FIN',type:H,x:250,y:763},{id:'022',zone:'FIN',type:H,x:250,y:729},
+  {id:'023',zone:'FIN',type:H,x:249,y:691},{id:'024',zone:'FIN',type:P,x:119,y:604},
+  {id:'025',zone:'FIN',type:P,x:157,y:603},{id:'026',zone:'FIN',type:P,x:191,y:603},
+  {id:'027',zone:'FIN',type:P,x:191,y:623},{id:'028',zone:'FIN',type:P,x:156,y:623},
+  {id:'029',zone:'FIN',type:P,x:119,y:622},{id:'030',zone:'FIN',type:P,x:120,y:544},
+  {id:'031',zone:'FIN',type:H,x:156,y:546},{id:'032',zone:'FIN',type:P,x:192,y:546},
+
+  // ── BD: WS617 (034-045), WS621 (046-057), WS624-partial (058-065) ──
+  {id:'034',zone:'BD',type:P,x:117,y:413},{id:'035',zone:'BD',type:H,x:156,y:415},
+  {id:'036',zone:'BD',type:H,x:191,y:415},{id:'037',zone:'BD',type:H,x:191,y:433},
+  {id:'038',zone:'BD',type:P,x:156,y:433},{id:'039',zone:'BD',type:P,x:118,y:433},
+  {id:'040',zone:'BD',type:P,x:117,y:337},{id:'041',zone:'BD',type:P,x:155,y:337},
+  {id:'042',zone:'BD',type:P,x:191,y:338},{id:'043',zone:'BD',type:P,x:192,y:356},
+  {id:'044',zone:'BD',type:H,x:156,y:357},{id:'045',zone:'BD',type:P,x:117,y:356},
+  {id:'046',zone:'BD',type:P,x:118,y:259},{id:'047',zone:'BD',type:H,x:156,y:262},
+  {id:'048',zone:'BD',type:P,x:192,y:259},{id:'049',zone:'BD',type:P,x:191,y:278},
+  {id:'050',zone:'BD',type:H,x:156,y:281},{id:'051',zone:'BD',type:P,x:118,y:278},
+  {id:'052',zone:'BD',type:P,x:119,y:185},{id:'053',zone:'BD',type:H,x:156,y:184},
+  {id:'054',zone:'BD',type:P,x:191,y:184},{id:'055',zone:'BD',type:P,x:192,y:203},
+  {id:'056',zone:'BD',type:H,x:156,y:205},{id:'057',zone:'BD',type:P,x:119,y:204},
+  {id:'058',zone:'BD',type:P,x:127,y:35},{id:'063',zone:'BD',type:P,x:145,y:35},
+  {id:'062',zone:'BD',type:H,x:127,y:72},{id:'059',zone:'BD',type:P,x:146,y:73},
+  {id:'061',zone:'BD',type:P,x:126,y:110},{id:'060',zone:'BD',type:H,x:146,y:109},
+
+  // ── M&A: WS624-partial (066-071), WS628 (073-086), WS632 (088-101), standalones ──
+  {id:'066',zone:'MA',type:P,x:248,y:35},{id:'067',zone:'MA',type:H,x:248,y:73},
+  {id:'068',zone:'MA',type:P,x:248,y:108},{id:'069',zone:'MA',type:P,x:267,y:108},
+  {id:'070',zone:'MA',type:H,x:267,y:73},{id:'071',zone:'MA',type:P,x:267,y:37},
+  {id:'064',zone:'BD',type:P,x:202,y:73},{id:'065',zone:'BD',type:P,x:202,y:108},
+  {id:'073',zone:'MA',type:P,x:346,y:36},
+  {id:'074',zone:'MA',type:H,x:346,y:73},{id:'075',zone:'MA',type:P,x:346,y:108},
+  {id:'076',zone:'MA',type:P,x:328,y:109},{id:'077',zone:'MA',type:P,x:327,y:73},
+  {id:'078',zone:'MA',type:P,x:328,y:37},{id:'079',zone:'MA',type:H,x:392,y:72},
+  {id:'080',zone:'MA',type:P,x:392,y:107},{id:'081',zone:'MA',type:P,x:470,y:37},
+  {id:'082',zone:'MA',type:P,x:470,y:72},{id:'083',zone:'MA',type:P,x:470,y:105},
+  {id:'084',zone:'MA',type:P,x:451,y:107},{id:'085',zone:'MA',type:H,x:451,y:72},
+  {id:'086',zone:'MA',type:P,x:451,y:36},
+  {id:'088',zone:'MA',type:P,x:550,y:35},{id:'089',zone:'MA',type:H,x:549,y:72},
+  {id:'090',zone:'MA',type:P,x:549,y:108},{id:'091',zone:'MA',type:P,x:532,y:108},
+  {id:'092',zone:'MA',type:H,x:532,y:72},{id:'093',zone:'MA',type:P,x:532,y:35},
+  {id:'094',zone:'MA',type:H,x:595,y:72},{id:'095',zone:'MA',type:P,x:595,y:107},
+  {id:'096',zone:'MA',type:P,x:671,y:36},{id:'097',zone:'MA',type:H,x:671,y:74},
+  {id:'098',zone:'MA',type:P,x:671,y:109},{id:'099',zone:'MA',type:P,x:652,y:109},
+  {id:'100',zone:'MA',type:H,x:652,y:74},{id:'101',zone:'MA',type:P,x:652,y:36},
+  {id:'105',zone:'MA',type:H,x:809,y:176},
+  {id:'106',zone:'MA',type:H,x:844,y:175},
+
+  // ── Legal: WS634-upper (107-112) ──
+  {id:'107',zone:'LEG',type:P,x:882,y:176},{id:'108',zone:'LEG',type:P,x:882,y:195},
+  {id:'109',zone:'LEG',type:P,x:844,y:194},{id:'110',zone:'LEG',type:P,x:809,y:195},
+  {id:'111',zone:'LEG',type:H,x:809,y:252},{id:'112',zone:'LEG',type:H,x:843,y:252},
+
+  // ── HR/Ops: WS634-lower (113-118) ──
+  {id:'113',zone:'HR',type:P,x:881,y:252},{id:'114',zone:'HR',type:H,x:881,y:272},
+  {id:'115',zone:'HR',type:H,x:844,y:272},{id:'116',zone:'HR',type:H,x:809,y:272},
+
+  // ── Executive offices ──
+  {id:'O625', zone:'EXEC',type:P,x:321,y:197},
+  {id:'O627', zone:'EXEC',type:P,x:478,y:193},
+  {id:'O631', zone:'EXEC',type:P,x:682,y:197},
+  {id:'O636', zone:'EXEC',type:P,x:694,y:280},
+  {id:'O618', zone:'EXEC',type:P,x:308,y:418},
+  {id:'EO633',zone:'EXEC',type:P,x:880,y:76},
+  {id:'EA632',zone:'EXEC',type:P,x:740,y:69},
+];
+// Store original desk types so reset can restore them
+DESKS.forEach(d=>d._origType=d.type);
+
+// ═══════════════════════════════════════════════
+// DEFAULT ASSIGNMENTS (from spreadsheet)
+// ═══════════════════════════════════════════════
+const DEFAULT_ASSIGNMENTS = {
+  '002':{name:'Andrea Stanley',team:'Finance'},
+  '003':{name:'Alicia James',team:'Finance'},
+  '004':{name:'Puneet Badesha',team:'Finance'},
+  '007':{name:'Jon Eldon',team:'Finance'},
+  '008':{name:'Ayomide Olatoye',team:'Finance'},
+  '009':{name:'Geoffrey Chaung',team:'Finance'},
+  '010':{name:'Theo Lewis',team:'Finance'},
+  '011':{name:'Dave Patel',team:'Finance'},
+  '012':{name:'Umaimah Nasir',team:'Finance'},
+  '013':{name:'Bharathi Srinivasan',team:'Finance'},
+  '014':{name:'Olivia Van Patter',team:'Finance'},
+  '015':{name:'Tom Moores',team:'Finance'},
+  '016':{name:'Chelsea Cohen',team:'Finance'},
+  '017':{name:'Raza Khan',team:'Finance'},
+  '018':{name:'Haoming Tan',team:'Finance'},
+  '019':{name:'Peter Finn',team:'Finance'},
+  '020':{name:'Chris Ball',team:'Finance'},
+  '024':{name:'Howard Leung',team:'Finance'},
+  '025':{name:'Myla Dimagiba',team:'Finance'},
+  '026':{name:'Kris Seed',team:'Finance'},
+  '027':{name:'Ahsan Muhammad',team:'Finance'},
+  '028':{name:'Kate Truong',team:'Finance'},
+  '029':{name:'Vaibhav Arora',team:'Finance'},
+  '030':{name:'Matt Kelly',team:'Finance'},
+  '032':{name:'Amanda Ruffolo',team:'Finance'},
+  '034':{name:'Luca Valeri',team:'BD'},
+  '038':{name:'Caleb Williams',team:'BD'},
+  '039':{name:'Patrick Egan',team:'BD'},
+  '040':{name:'Ben Abnett',team:'BD'},
+  '041':{name:'Shane Bachman',team:'BD'},
+  '042':{name:'Abdullah Faris',team:'BD'},
+  '043':{name:'Darcie Da Silva',team:'BD'},
+  '045':{name:'Harpreet Singh',team:'BD'},
+  '046':{name:'Diba Taghvai',team:'BD'},
+  '048':{name:'Hilary Lloyd',team:'BD'},
+  '049':{name:'Yonny Ghebremedhin',team:'BD'},
+  '051':{name:'Sigi Ochoa Herrera',team:'BD'},
+  '052':{name:'MinSoo Jeong',team:'BD'},
+  '054':{name:'Max East',team:'BD'},
+  '055':{name:'Ayaan Khan',team:'BD'},
+  '057':{name:'Michael Bottomley',team:'BD'},
+  '058':{name:'Mathew Henderson',team:'BD'},
+  '059':{name:'Manek Khowaja',team:'BD'},
+  '061':{name:'Gregory MacNeill',team:'BD'},
+  '063':{name:'Charles Duckworth',team:'BD'},
+  '064':{name:'Jordan Bezanson',team:'BD'},
+  '065':{name:'Allie Russell',team:'BD'},
+  '066':{name:'Ethan Beallor',team:'M&A'},
+  '068':{name:'Clay Carter',team:'M&A'},
+  '069':{name:'Patrick Finamore',team:'M&A'},
+  '071':{name:'Jillian Stickland',team:'M&A'},
+  '073':{name:'Nav Kathpalia',team:'M&A'},
+  '075':{name:'Belén Tainta Neira',team:'M&A'},
+  '076':{name:'Adeel Mirza',team:'M&A'},
+  '077':{name:'Adriaan De Visser',team:'M&A'},
+  '078':{name:'Sam Castiglione',team:'M&A'},
+  '080':{name:'Valentina Matheus Raffalli',team:'M&A'},
+  '081':{name:'Daniel Cameron',team:'M&A'},
+  '082':{name:'Vrushank Desai',team:'M&A'},
+  '083':{name:'Agnes Lam',team:'M&A'},
+  '084':{name:'Simon Hicks',team:'M&A'},
+  '086':{name:'Patrick Brown',team:'M&A'},
+  '088':{name:'Jeff Davie',team:'M&A'},
+  '090':{name:'Manuri Srikugan',team:'M&A'},
+  '091':{name:'Remus Leung',team:'M&A'},
+  '093':{name:'Mark Speakman',team:'M&A'},
+  '095':{name:'Akshaan Tejwani',team:'M&A'},
+  '096':{name:'Jesse Armel',team:'M&A'},
+  '098':{name:'Kyle Wagman',team:'M&A'},
+  '099':{name:'Josh Lexier',team:'M&A'},
+  '101':{name:'Pat Doyle',team:'M&A'},
+  '107':{name:'Tom Prendiville',team:'Legal'},
+  '108':{name:'Emma Walter',team:'Legal'},
+  '109':{name:'Ian Carty',team:'Legal'},
+  '110':{name:'Patricia Reyes',team:'Legal'},
+  '113':{name:'Jane Rhee',team:'HR'},
+  'O618':{name:'Benji Sucher',team:'Executive (CFO)'},
+  'O625':{name:'Aaron Booth',team:'Executive (SVP BD)'},
+  'O627':{name:'Max Risen',team:'Executive (President M&A)'},
+  'O631':{name:'Tonya Cross',team:'Executive (COO)'},
+  'O636':{name:'Marjan Elbaum',team:'Executive (General Counsel)'},
+  'EO633':{name:'David Berkal',team:'Executive (CEO)'},
+  'EA632':{name:'Nicole Kotyk',team:'Executive (EA to CEO)'},
+};
+
+// ═══════════════════════════════════════════════
+// STATE (persisted to server-side state.json)
+// ═══════════════════════════════════════════════
+const SK = 'banyan_fp_v2';
+function defaultState(){ return {assignments:{...DEFAULT_ASSIGNMENTS}, bookings:{}, deskTypes:{}}; }
+
+function ensureState(s){
+  if(!s.deskTypes) s.deskTypes={};
+  if(!s.bookings)  s.bookings={};
+  return s;
+}
+
+function loadState(){
+  // Synchronous load — try localStorage first for instant render
+  try{const r=localStorage.getItem(SK);if(r)return ensureState(JSON.parse(r));}catch(e){}
+  return defaultState();
+}
+
+function saveState(){
+  // Apply any desk type overrides
+  if(state.deskTypes){
+    Object.entries(state.deskTypes).forEach(([id,t])=>{
+      const d=DESKS.find(x=>x.id===id);
+      if(d) d.type = t==='hotel'?H:P;
+    });
+  }
+  // Save to localStorage (instant)
+  try{localStorage.setItem(SK,JSON.stringify(state));}catch(e){}
+  // Save to server file (async, fire-and-forget)
+  fetch('/api/state',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(state)
+  }).catch(()=>{});
+}
+
+// Async load from server on startup — overwrites localStorage if server has data
+function loadFromServer(){
+  fetch('/api/state').then(r=>r.json()).then(data=>{
+    if(data && data.assignments){
+      state=ensureState(data);
+      // Restore desk type overrides
+      if(state.deskTypes){
+        Object.entries(state.deskTypes).forEach(([id,t])=>{
+          const d=DESKS.find(x=>x.id===id);
+          if(d) d.type = t==='hotel'?H:P;
+        });
+      }
+      try{localStorage.setItem(SK,JSON.stringify(state));}catch(e){}
+      renderDesks();
+      renderCalPanel();
+    }
+  }).catch(()=>{/* server not available, localStorage is fine */});
+}
+function resetToDefault(){
+  if(!confirm('Reset all assignments to the original spreadsheet data? Bookings will be cleared.'))return;
+  state={assignments:{...DEFAULT_ASSIGNMENTS},bookings:{},deskTypes:{}};
+  // Restore original desk types from DESKS array defaults
+  DESKS.forEach(d=>{const orig=d._origType;if(orig)d.type=orig;});
+  saveState();renderDesks();closeSidebar();toast('Reset to default assignments');
+}
+
+let state=loadState();
+let selectedId=null;
+let pending=null;
+const TODAY=new Date().toISOString().split('T')[0];
+const R=6;
+
+// ═══════════════════════════════════════════════
+// RENDERING
+// ═══════════════════════════════════════════════
+function deskState(d){
+  if(d.type===P){return state.assignments[d.id]?'occupied':'free';}
+  const bks=state.bookings[d.id]||[];
+  const viewDate = typeof cpSelectedDate!=='undefined' ? cpSelectedDate : TODAY;
+  return bks.some(b=>b.date===viewDate)?'booked-today':'available';
+}
+
+function initials(name){
+  if(!name)return'';
+  return name.trim().split(/\s+/).map(p=>p[0]).join('').toUpperCase().slice(0,2);
+}
+
+function renderDesks(){
+  const layer=document.getElementById('desks-layer');
+  layer.innerHTML='';
+  const ns='http://www.w3.org/2000/svg';
+  DESKS.forEach(d=>{
+    const ds=deskState(d);
+    const isHotel=d.type===H;
+    const isExec=d.zone==='EXEC';
+    const isSel=d.id===selectedId;
+    const isMoveSource=d.id===moveSource;
+    const asgn=state.assignments[d.id];
+
+    // Unified colour scheme — no zone-based colours
+    let fill,stroke;
+    if(isHotel){
+      fill=ds==='booked-today'?'#395542':'#9BCBEB';
+      stroke=ds==='booked-today'?'#2d4535':'#6ba8cf';
+    } else {
+      // permanent + exec: same green palette
+      fill=ds==='occupied'?'#395542':'#ffffff';
+      stroke='#395542';
+    }
+
+    const g=document.createElementNS(ns,'g');
+    g.setAttribute('class','desk');
+    g.setAttribute('data-id',d.id);
+    g.addEventListener('click',()=>selectDesk(d.id));
+
+    const title=document.createElementNS(ns,'title');
+    title.textContent=asgn?`${d.id} — ${asgn.name}`:(isHotel?`${d.id} (hotel)`:`${d.id} (unassigned)`);
+    g.appendChild(title);
+
+    if(isHotel && !isExec){
+      // Diamond — white halo for contrast against floor plan image
+      const halo=document.createElementNS(ns,'rect');
+      halo.setAttribute('x',d.x-R-1);halo.setAttribute('y',d.y-R-1);
+      halo.setAttribute('width',R*2+2);halo.setAttribute('height',R*2+2);
+      halo.setAttribute('fill','white');halo.setAttribute('opacity','0.82');
+      halo.setAttribute('transform',`rotate(45 ${d.x} ${d.y})`);
+      g.appendChild(halo);
+      const shape=document.createElementNS(ns,'rect');
+      shape.setAttribute('class','d-shape');
+      shape.setAttribute('x',d.x-R+1);shape.setAttribute('y',d.y-R+1);
+      shape.setAttribute('width',R*2-2);shape.setAttribute('height',R*2-2);
+      shape.setAttribute('fill',fill);
+      shape.setAttribute('stroke',isMoveSource?'#F1BE48':(isSel?'#FFD700':stroke));
+      shape.setAttribute('stroke-width',(isMoveSource||isSel)?'2.5':'1.5');
+      shape.setAttribute('transform',`rotate(45 ${d.x} ${d.y})`);
+      g.appendChild(shape);
+      // Add "H" label for hotel desks
+      const ht=document.createElementNS(ns,'text');
+      ht.setAttribute('x',d.x);ht.setAttribute('y',d.y+2.5);
+      ht.setAttribute('text-anchor','middle');
+      ht.setAttribute('font-family','Libre Franklin,sans-serif');
+      ht.setAttribute('font-weight','600');ht.setAttribute('font-size','6');
+      ht.setAttribute('fill','white');
+      ht.setAttribute('pointer-events','none');
+      ht.textContent='H';
+      g.appendChild(ht);
+    } else {
+      // Circle — white halo for contrast against floor plan image
+      const halo=document.createElementNS(ns,'circle');
+      halo.setAttribute('cx',d.x);halo.setAttribute('cy',d.y);halo.setAttribute('r',R+2);
+      halo.setAttribute('fill','white');halo.setAttribute('opacity','0.82');
+      g.appendChild(halo);
+      const circle=document.createElementNS(ns,'circle');
+      circle.setAttribute('class','d-shape');
+      circle.setAttribute('cx',d.x);circle.setAttribute('cy',d.y);circle.setAttribute('r',R);
+      circle.setAttribute('fill',fill);
+      circle.setAttribute('stroke',isMoveSource?'#F1BE48':(isSel?'#FFD700':stroke));
+      circle.setAttribute('stroke-width',(isMoveSource||isSel)?'2.5':'1.5');
+      g.appendChild(circle);
+      if(asgn){
+        const t=document.createElementNS(ns,'text');
+        t.setAttribute('x',d.x);t.setAttribute('y',d.y+2.5);
+        t.setAttribute('text-anchor','middle');
+        t.setAttribute('font-family','Libre Franklin,sans-serif');
+        t.setAttribute('font-weight','600');t.setAttribute('font-size','6');
+        t.setAttribute('fill','white');
+        t.setAttribute('pointer-events','none');
+        t.textContent=initials(asgn.name);
+        g.appendChild(t);
+      }
+    }
+    layer.appendChild(g);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════
+function selectDesk(id){
+  if(moveSource && handleMoveTarget(id)) return;
+  selectedId=id; renderDesks();
+  const d=DESKS.find(x=>x.id===id); if(!d)return;
+  const hdr=document.getElementById('sb-hdr');
+  hdr.style.background='var(--moss)';
+  hdr.style.color='white';
+  document.getElementById('sb-id').textContent=d.zone==='EXEC'?'Private Office — '+id:'Desk '+id;
+  document.getElementById('sb-type').textContent=
+    d.zone==='EXEC'?'Private Office':
+    d.type===P?'Permanent Desk':'Hotel Desk (Bookable)';
+  renderSbBody(d);
+  document.getElementById('sidebar').classList.add('open');
+}
+
+function closeSidebar(){
+  selectedId=null;renderDesks();
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function renderSbBody(d){
+  document.getElementById('sb-body').innerHTML=
+    d.type===P?permanentHtml(d):hotelHtml(d);
+}
+
+function permanentHtml(d){
+  const asgn=state.assignments[d.id];
+  let html='';
+  if(asgn){
+    html+=`<div class="occ-card">
+      <div class="occ-av">${esc(initials(asgn.name))}</div>
+      <div><div class="occ-name">${esc(asgn.name)}</div><div class="occ-sub">${esc(asgn.team||'No team set')}</div></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="openAssignModal('reassign')">Reassign</button>
+      <button class="btn btn-secondary" onclick="startMove('${d.id}')">Move</button>
+      <button class="btn btn-danger" onclick="clearAssign('${d.id}')">Clear</button>
+    </div>`;
+  } else {
+    html+=`<div class="occ-card">
+      <div class="occ-av empty" style="font-size:18px">⊕</div>
+      <div><div class="occ-name">Unassigned</div><div class="occ-sub">No one sitting here</div></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="openAssignModal('assign')">Assign This Desk</button>`;
+  }
+  if(d.zone!=='EXEC'){
+    html+=`<div class="divider"></div>
+    <button class="btn btn-ghost" style="width:100%" onclick="convertToHotel('${d.id}')">Convert to Hotel Desk</button>`;
+  }
+  return html;
+}
+
+function hotelHtml(d){
+  const bookings=state.bookings[d.id]||[];
+  const days=[];
+  for(let i=0;i<14;i++){
+    const dt=new Date();dt.setDate(dt.getDate()+i);
+    const ds=dt.toISOString().split('T')[0];
+    const bk=bookings.find(b=>b.date===ds);
+    const dow=dt.getDay();
+    days.push({date:ds,dn:dt.getDate(),dd:dt.toLocaleDateString('en',{weekday:'short'}),bk,isToday:i===0,isWknd:dow===0||dow===6});
+  }
+  let cal='<div class="cal-grid">';
+  days.forEach(day=>{
+    let cls='cal-day'+(day.bk?(day.isToday?' booked-today':' booked'):' avail')+(day.isWknd?' weekend':'');
+    const tip=day.bk?`Booked: ${day.bk.name}`:'Available — click to book';
+    const click=!day.bk?`onclick="openBookModal('${day.date}')"`:'' ;
+    cal+=`<div class="${cls}" title="${tip}" ${click}><span class="dd">${day.dd}</span><span class="dn">${day.dn}</span></div>`;
+  });
+  cal+='</div>';
+  const upcoming=bookings.filter(b=>b.date>=TODAY).sort((a,b)=>a.date.localeCompare(b.date));
+  let list=`<div class="sec-title">Upcoming Bookings</div>`;
+  if(!upcoming.length){list+=`<div class="empty-st">No upcoming bookings</div>`;}
+  else{
+    list+=`<div class="bk-list">`;
+    upcoming.forEach(b=>{
+      const lbl=new Date(b.date+'T12:00:00').toLocaleDateString('en',{month:'short',day:'numeric'});
+      list+=`<div class="bk-item">
+        <span class="bk-date">${lbl}</span>
+        <span class="bk-name">${esc(b.name)}<br><small style="color:#999">${esc(b.team||'')}</small></span>
+        <button class="bk-del" onclick="delBooking('${d.id}','${b.id}')" title="Cancel">×</button>
+      </div>`;
+    });
+    list+=`</div>`;
+  }
+  let convertBtn=`<div class="divider"></div>
+    <button class="btn btn-ghost" style="width:100%" onclick="convertToPermanent('${d.id}')">Convert to Permanent Desk</button>`;
+  return`<div class="sec-title">Next 14 Days</div>${cal}<div class="divider"></div>${list}${convertBtn}`;
+}
+
+// ═══════════════════════════════════════════════
+// ASSIGN ACTIONS
+// ═══════════════════════════════════════════════
+function openAssignModal(mode){
+  pending={type:mode,deskId:selectedId};
+  document.getElementById('m-assign-title').textContent=mode==='assign'?`Assign Desk ${selectedId}`:`Reassign Desk ${selectedId}`;
+  const a=state.assignments[selectedId];
+  document.getElementById('a-name').value=mode==='reassign'&&a?a.name:'';
+  document.getElementById('a-team').value=mode==='reassign'&&a?a.team||'':'';
+  document.getElementById('m-assign').classList.add('show');
+  setTimeout(()=>document.getElementById('a-name').focus(),80);
+}
+
+function confirmAssign(){
+  const name=document.getElementById('a-name').value.trim();
+  const team=document.getElementById('a-team').value.trim();
+  if(!name){toast('Please enter a name');return;}
+  state.assignments[pending.deskId]={name,team};
+  saveState();closeModal('m-assign');renderDesks();
+  const d=DESKS.find(x=>x.id===pending.deskId);if(d)renderSbBody(d);
+  toast(`${name} assigned to desk ${pending.deskId}`);
+}
+
+function clearAssign(id){
+  if(!confirm(`Remove assignment from desk ${id}?`))return;
+  delete state.assignments[id];saveState();renderDesks();
+  const d=DESKS.find(x=>x.id===id);if(d)renderSbBody(d);
+  toast('Assignment cleared');
+}
+
+// ═══════════════════════════════════════════════
+// CONVERT DESK TYPE
+// ═══════════════════════════════════════════════
+function convertToPermanent(id){
+  if(!confirm(`Convert desk ${id} from Hotel to Permanent?`))return;
+  const d=DESKS.find(x=>x.id===id);if(!d)return;
+  d.type=P;
+  if(!state.deskTypes) state.deskTypes={};
+  state.deskTypes[id]='permanent';
+  // Clear any hotel bookings
+  delete state.bookings[id];
+  saveState();renderDesks();
+  document.getElementById('sb-type').textContent='Permanent Desk';
+  renderSbBody(d);
+  toast(`Desk ${id} converted to Permanent`);
+}
+
+function convertToHotel(id){
+  if(!confirm(`Convert desk ${id} from Permanent to Hotel?`))return;
+  const d=DESKS.find(x=>x.id===id);if(!d)return;
+  d.type=H;
+  if(!state.deskTypes) state.deskTypes={};
+  state.deskTypes[id]='hotel';
+  // Clear any permanent assignment
+  delete state.assignments[id];
+  saveState();renderDesks();
+  document.getElementById('sb-type').textContent='Hotel Desk (Bookable)';
+  renderSbBody(d);
+  toast(`Desk ${id} converted to Hotel`);
+}
+
+// ═══════════════════════════════════════════════
+// MOVE DESK
+// ═══════════════════════════════════════════════
+let moveSource=null;
+
+function startMove(id){
+  const asgn=state.assignments[id];
+  if(!asgn)return;
+  moveSource=id;
+  document.getElementById('move-name').textContent=asgn.name;
+  document.body.classList.add('move-mode');
+  closeSidebar();
+  // Highlight the source desk
+  renderDesks();
+}
+
+function cancelMove(){
+  moveSource=null;
+  document.body.classList.remove('move-mode');
+  renderDesks();
+}
+
+function handleMoveTarget(targetId){
+  if(!moveSource)return false;
+  const srcDesk=DESKS.find(x=>x.id===moveSource);
+  const tgtDesk=DESKS.find(x=>x.id===targetId);
+  if(!srcDesk||!tgtDesk)return false;
+
+  if(targetId===moveSource){
+    toast('That\'s the same desk — pick a different one');
+    return true;
+  }
+
+  const srcAsgn=state.assignments[moveSource];
+  const tgtAsgn=state.assignments[targetId];
+
+  // If target is a hotel desk, silently convert it to permanent first
+  if(tgtDesk.type===H){
+    tgtDesk.type=P;
+    if(!state.deskTypes) state.deskTypes={};
+    state.deskTypes[targetId]='permanent';
+    delete state.bookings[targetId];
+  }
+
+  if(tgtAsgn){
+    if(!confirm(`Desk ${targetId} is assigned to ${tgtAsgn.name}.\nMove ${srcAsgn.name} here and free up desk ${moveSource}?`))return true;
+  }
+
+  // Move person to target desk, free up source
+  state.assignments[targetId]=srcAsgn;
+  delete state.assignments[moveSource];
+  // Save to localStorage immediately, then wait for server POST before reloading
+  try{localStorage.setItem(SK,JSON.stringify(state));}catch(e){}
+  fetch('/api/state',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(state)
+  }).then(()=>{
+    cancelMove();
+    toast(`${srcAsgn.name} moved to desk ${targetId}`);
+    setTimeout(()=>location.reload(), 600);
+  }).catch(()=>{
+    cancelMove();
+    toast(`${srcAsgn.name} moved to desk ${targetId}`);
+    setTimeout(()=>location.reload(), 600);
+  });
+  return true;
+}
+
+// ═══════════════════════════════════════════════
+// BOOKING ACTIONS
+// ═══════════════════════════════════════════════
+function openBookModal(date){
+  pending={type:'book',deskId:selectedId,date};
+  document.getElementById('b-date').value=date;
+  document.getElementById('b-name').value='';
+  document.getElementById('b-team').value='';
+  document.getElementById('m-book').classList.add('show');
+  setTimeout(()=>document.getElementById('b-name').focus(),80);
+}
+
+function confirmBook(){
+  const date=document.getElementById('b-date').value;
+  const name=document.getElementById('b-name').value.trim();
+  const team=document.getElementById('b-team').value.trim();
+  if(!name){toast('Please enter your name');return;}
+  if(!date){toast('Please select a date');return;}
+  if(!state.bookings[pending.deskId])state.bookings[pending.deskId]=[];
+  if(state.bookings[pending.deskId].some(b=>b.date===date)){toast('Already booked for that date');return;}
+  state.bookings[pending.deskId].push({id:Date.now().toString(),date,name,team});
+  saveState();closeModal('m-book');renderDesks();
+  const d=DESKS.find(x=>x.id===pending.deskId);if(d)renderSbBody(d);
+  const lbl=new Date(date+'T12:00:00').toLocaleDateString('en',{month:'short',day:'numeric'});
+  toast(`${name} booked desk ${pending.deskId} — ${lbl}`);
+}
+
+function delBooking(deskId,bkId){
+  if(!state.bookings[deskId])return;
+  state.bookings[deskId]=state.bookings[deskId].filter(b=>b.id!==bkId);
+  saveState();renderDesks();
+  const d=DESKS.find(x=>x.id===deskId);if(d)renderSbBody(d);
+  toast('Booking cancelled');
+}
+
+// ═══════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════
+document.getElementById('search-input').addEventListener('input',function(){
+  const q=this.value.trim().toLowerCase();
+  const hl=document.getElementById('highlight-layer');
+  hl.innerHTML='';
+  if(!q)return;
+  const ns='http://www.w3.org/2000/svg';
+  const hits=DESKS.filter(d=>{
+    const a=state.assignments[d.id];
+    return a&&a.name.toLowerCase().includes(q);
+  });
+  hits.forEach(d=>{
+    const ring=document.createElementNS(ns,'circle');
+    ring.setAttribute('cx',d.x);ring.setAttribute('cy',d.y);ring.setAttribute('r',R+5);
+    ring.setAttribute('fill','none');ring.setAttribute('stroke','#FFD700');
+    ring.setAttribute('stroke-width','2.5');ring.setAttribute('opacity','.9');
+    hl.appendChild(ring);
+  });
+  if(hits.length===1)selectDesk(hits[0].id);
+});
+
+// ═══════════════════════════════════════════════
+// IMPORT / EXPORT
+// ═══════════════════════════════════════════════
+function exportData(){
+  const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),assignments:state.assignments,bookings:state.bookings},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`banyan-floorplan-${TODAY}.json`;a.click();URL.revokeObjectURL(a.href);
+  toast('Exported');
+}
+
+function importData(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        if(data.assignments)state.assignments=data.assignments;
+        if(data.bookings)state.bookings=data.bookings;
+        saveState();renderDesks();closeSidebar();toast('Imported successfully');
+      }catch{toast('Error: invalid file');}
+    };r.readAsText(f);
+  };inp.click();
+}
+
+// ═══════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+let toastT;
+function toast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+// Modal backdrops + enter keys
+document.querySelectorAll('.modal-ov').forEach(ov=>ov.addEventListener('click',e=>{if(e.target===ov)closeModal(ov.id);}));
+['a-name','a-team'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')confirmAssign();}));
+['b-name','b-team'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')confirmBook();}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&moveSource)cancelMove();});
+
+// ═══════════════════════════════════════════════
+// CALENDAR PANEL (right side — all hotel bookings)
+// ═══════════════════════════════════════════════
+let cpSelectedDate = TODAY;
+
+function renderCalPanel(){
+  // Build 14-day grid
+  const days = [];
+  for(let i=0;i<14;i++){
+    const dt=new Date();dt.setDate(dt.getDate()+i);
+    const ds=dt.toISOString().split('T')[0];
+    const dow=dt.getDay();
+    // Count bookings across ALL hotel desks for this date
+    let count=0;
+    DESKS.forEach(d=>{
+      if(d.type===H){
+        const bks=state.bookings[d.id]||[];
+        if(bks.some(b=>b.date===ds)) count++;
+      }
+    });
+    days.push({date:ds,dn:dt.getDate(),dd:dt.toLocaleDateString('en',{weekday:'short'}),count,isToday:i===0,isWknd:dow===0||dow===6});
+  }
+
+  let cal='<div class="cp-grid">';
+  days.forEach(day=>{
+    let cls='cp-day';
+    if(day.date===cpSelectedDate) cls+=' cp-selected';
+    else if(day.isToday) cls+=' cp-today';
+    else if(day.count>0) cls+=' cp-has-bookings';
+    if(day.isWknd) cls+=' cp-weekend';
+    const badge=day.count>0?`<span class="cp-badge">${day.count}</span>`:'';
+    cal+=`<div class="${cls}" onclick="selectCalDay('${day.date}')"><span class="dd">${day.dd}</span><span class="dn">${day.dn}</span>${badge}</div>`;
+  });
+  cal+='</div>';
+  document.getElementById('cp-calendar').innerHTML=cal;
+
+  renderCalDetail();
+}
+
+function selectCalDay(date){
+  cpSelectedDate=date;
+  renderCalPanel();
+  // Update the floor plan to highlight desks booked on this date
+  renderDesks();
+}
+
+function renderCalDetail(){
+  const dateLbl=new Date(cpSelectedDate+'T12:00:00').toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'});
+
+  // Gather all hotel bookings for the selected date
+  const bookings=[];
+  DESKS.forEach(d=>{
+    if(d.type===H){
+      const bks=state.bookings[d.id]||[];
+      const bk=bks.find(b=>b.date===cpSelectedDate);
+      if(bk) bookings.push({deskId:d.id, name:bk.name, team:bk.team||''});
+    }
+  });
+
+  // Count available hotel desks
+  const totalHotel=DESKS.filter(d=>d.type===H).length;
+  const booked=bookings.length;
+  const avail=totalHotel-booked;
+
+  let html=`<div class="cp-date-label">${esc(dateLbl)}</div>`;
+  html+=`<div class="cp-summary"><span>${booked}</span> booked &nbsp;·&nbsp; <span>${avail}</span> available</div>`;
+
+  if(!bookings.length){
+    html+=`<div class="cp-no-bookings">No hotel bookings this day</div>`;
+  } else {
+    bookings.sort((a,b)=>a.deskId.localeCompare(b.deskId,undefined,{numeric:true}));
+    bookings.forEach(b=>{
+      html+=`<div class="cp-booking" onclick="selectDesk('${b.deskId}')" style="cursor:pointer">
+        <span class="cp-desk-id">${esc(b.deskId)}</span>
+        <span class="cp-bk-name">${esc(b.name)}<br><small style="color:#999">${esc(b.team)}</small></span>
+      </div>`;
+    });
+  }
+  document.getElementById('cp-detail').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════
+// SCROLL-TO-ZOOM
+// ═══════════════════════════════════════════════
+let mapZoom = parseFloat(sessionStorage.getItem('fp_zoom')) || 1;
+const fpArea = document.querySelector('.fp-area');
+const fpWrap = document.querySelector('.fp-wrap');
+
+function applyZoom(){
+  fpWrap.style.transform = `scale(${mapZoom})`;
+  fpWrap.style.maxWidth = (1000 * mapZoom) + 'px';
+  sessionStorage.setItem('fp_zoom', mapZoom);
+}
+// Restore zoom on load
+if(mapZoom !== 1) applyZoom();
+
+fpArea.addEventListener('wheel', e => {
+  if (!e.ctrlKey && !e.metaKey) return;   // only zoom on Ctrl+scroll
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? -0.1 : 0.1;
+  mapZoom = Math.min(4, Math.max(0.5, mapZoom + delta));
+  applyZoom();
+}, {passive: false});
+
+// Double-click to reset zoom
+fpArea.addEventListener('dblclick', () => {
+  mapZoom = 1;
+  applyZoom();
+});
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+renderDesks();
+renderCalPanel();
+loadFromServer();   // async — overwrite with server data if available
+</script>
+</body>
+</html>

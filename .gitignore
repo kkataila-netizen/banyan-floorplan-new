@@ -1,0 +1,22 @@
+# Local Netlify folder
+.netlify
+
+# Dependencies
+node_modules/
+
+# Local state file (server-side dev only)
+state.json
+
+# Temp/extracted files from previous sessions
+xlsx_extract/
+verify-overlay.png
+floorplan-img1.png
+floorplan-img3.png
+
+# Dev tools (not needed in production)
+align.html
+calibrate.html
+
+# OS files
+Thumbs.db
+.DS_Store
