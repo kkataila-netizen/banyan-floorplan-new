@@ -14,7 +14,7 @@ export default async (req, context) => {
     return new Response(null, { status: 204, headers: CORS });
   }
 
-  const store = getStore(STORE_NAME);
+  const store = getStore({ name: STORE_NAME, consistency: "strong" });
 
   // GET — return saved state (or null if none)
   if (req.method === "GET") {
