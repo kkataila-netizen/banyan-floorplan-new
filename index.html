@@ -26,6 +26,17 @@ body{font-family:'Source Sans 3','Source Sans Pro',sans-serif;font-weight:300;co
 .search-wrap input{background:none;border:none;outline:none;color:#fff;font-family:'Source Sans 3',sans-serif;font-size:13px;width:170px}
 .search-wrap input::placeholder{color:rgba(255,255,255,.5)}
 
+/* ADMIN BUTTON */
+.admin-btn{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.22);padding:5px 13px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;transition:all .15s;display:flex;align-items:center;gap:6px}
+.admin-btn:hover{background:rgba(255,255,255,.22)}
+.admin-btn.admin-on{background:var(--gold);color:#333;border-color:var(--gold)}
+.admin-btn.admin-on:hover{background:#e5b443}
+.admin-dot{width:7px;height:7px;border-radius:50%;background:#9bbfa8}
+.admin-btn.admin-on .admin-dot{background:#2d4535}
+
+/* Hide admin-only elements when not logged in */
+body:not(.is-admin) .admin-only{display:none !important;}
+
 /* TOOLBAR */
 .toolbar{background:#fff;border-bottom:1px solid var(--border);padding:7px 18px;display:flex;align-items:center;gap:18px;flex-shrink:0}
 .legend{display:flex;align-items:center;gap:14px;font-size:12px;flex-wrap:wrap}
@@ -152,6 +163,7 @@ body.move-mode .move-banner{display:block}
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="search-input" placeholder="Find a person…">
     </div>
+    <button class="admin-btn" id="admin-btn" onclick="adminBtnClick()" title="Log in as admin to make changes"><span class="admin-dot"></span><span id="admin-btn-label">Admin Login</span></button>
   </div>
 </header>
 
@@ -168,8 +180,8 @@ body.move-mode .move-banner{display:block}
     <div class="leg-item"><div class="leg-diamond" style="background:var(--moss);border:1.5px solid var(--moss-d)"></div><span>Hotel (booked today)</span></div>
   </div>
   <div class="tbar-right">
-    <button class="btn btn-ghost btn-sm" onclick="exportData()">Export</button>
-    <button class="btn btn-secondary btn-sm" onclick="importData()">Import</button>
+    <button class="btn btn-ghost btn-sm admin-only" onclick="exportData()">Export</button>
+    <button class="btn btn-secondary btn-sm admin-only" onclick="importData()">Import</button>
     <button class="btn btn-danger btn-sm" onclick="resetToDefault()">Reset</button>
   </div>
 </div>
@@ -227,6 +239,18 @@ body.move-mode .move-banner{display:block}
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('m-assign')">Cancel</button>
       <button class="btn btn-primary" onclick="confirmAssign()">Assign</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Login Modal -->
+<div class="modal-ov" id="m-admin">
+  <div class="modal">
+    <div class="modal-title">Admin Login</div>
+    <div class="fg"><label class="flabel">Password</label><input class="finput" id="admin-pwd" type="password" placeholder="Enter admin password" autocomplete="off"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-admin')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAdmin()">Log In</button>
     </div>
   </div>
 </div>
@@ -424,6 +448,78 @@ const DEFAULT_ASSIGNMENTS = {
   'EO633':{name:'David Berkal',team:'Executive (CEO)'},
   'EA632':{name:'Nicole Kotyk',team:'Executive (EA to CEO)'},
 };
+
+// ═══════════════════════════════════════════════
+// ADMIN AUTH (client-side gate — see note in source)
+// Note: this is a UX gate only. The password is visible in source; for
+// real security a server-side check would be required. Sufficient as an
+// "honor system" speed bump for an internal trusted-network tool.
+// ═══════════════════════════════════════════════
+const ADMIN_PWD='kkataila';
+const ADMIN_KEY='banyan_fp_admin';
+
+function isAdmin(){return sessionStorage.getItem(ADMIN_KEY)==='1';}
+
+function setAdmin(on){
+  if(on){sessionStorage.setItem(ADMIN_KEY,'1');document.body.classList.add('is-admin');}
+  else{sessionStorage.removeItem(ADMIN_KEY);document.body.classList.remove('is-admin');}
+  updateAdminUI();
+  // Re-render sidebar so admin-only buttons appear/disappear immediately
+  if(typeof selectedId!=='undefined' && selectedId){
+    const d=DESKS.find(x=>x.id===selectedId);
+    if(d)renderSbBody(d);
+  }
+}
+
+function updateAdminUI(){
+  const btn=document.getElementById('admin-btn');
+  const lbl=document.getElementById('admin-btn-label');
+  if(!btn||!lbl)return;
+  if(isAdmin()){
+    btn.classList.add('admin-on');
+    lbl.textContent='Admin ✓';
+    btn.title='Admin mode active — click to log out';
+  } else {
+    btn.classList.remove('admin-on');
+    lbl.textContent='Admin Login';
+    btn.title='Log in as admin to make changes';
+  }
+}
+
+function adminBtnClick(){
+  if(isAdmin()){
+    if(confirm('Log out of admin mode?')){
+      // Cancel any active move
+      if(typeof moveSource!=='undefined' && moveSource) cancelMove();
+      setAdmin(false);
+      toast('Logged out of admin mode');
+    }
+  } else {
+    document.getElementById('admin-pwd').value='';
+    document.getElementById('m-admin').classList.add('show');
+    setTimeout(()=>document.getElementById('admin-pwd').focus(),80);
+  }
+}
+
+function confirmAdmin(){
+  const pwd=document.getElementById('admin-pwd').value;
+  if(pwd===ADMIN_PWD){
+    setAdmin(true);
+    closeModal('m-admin');
+    toast('Admin mode activated');
+  } else {
+    toast('Incorrect password');
+    document.getElementById('admin-pwd').value='';
+    document.getElementById('admin-pwd').focus();
+  }
+}
+
+function requireAdmin(){
+  if(isAdmin())return true;
+  toast('Admin login required');
+  adminBtnClick();
+  return false;
+}
 
 // ═══════════════════════════════════════════════
 // STATE (persisted to server-side state.json)
@@ -876,13 +972,15 @@ document.getElementById('search-input').addEventListener('input',function(){
 // IMPORT / EXPORT
 // ═══════════════════════════════════════════════
 function exportData(){
-  const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),assignments:state.assignments,bookings:state.bookings},null,2)],{type:'application/json'});
+  if(!requireAdmin())return;
+  const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),assignments:state.assignments,bookings:state.bookings,deskTypes:state.deskTypes||{}},null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=`banyan-floorplan-${TODAY}.json`;a.click();URL.revokeObjectURL(a.href);
   toast('Exported');
 }
 
 function importData(){
+  if(!requireAdmin())return;
   const inp=document.createElement('input');inp.type='file';inp.accept='.json';
   inp.onchange=e=>{
     const f=e.target.files[0];if(!f)return;
@@ -892,7 +990,15 @@ function importData(){
         const data=JSON.parse(ev.target.result);
         if(data.assignments)state.assignments=data.assignments;
         if(data.bookings)state.bookings=data.bookings;
-        saveState();renderDesks();closeSidebar();toast('Imported successfully');
+        if(data.deskTypes){
+          state.deskTypes=data.deskTypes;
+          // Apply desk type overrides to the in-memory DESKS array
+          Object.entries(state.deskTypes).forEach(([id,t])=>{
+            const dd=DESKS.find(x=>x.id===id);
+            if(dd) dd.type = t==='hotel'?H:P;
+          });
+        }
+        saveState();renderDesks();renderCalPanel();closeSidebar();toast('Imported successfully');
       }catch{toast('Error: invalid file');}
     };r.readAsText(f);
   };inp.click();
@@ -913,7 +1019,12 @@ function toast(msg){
 document.querySelectorAll('.modal-ov').forEach(ov=>ov.addEventListener('click',e=>{if(e.target===ov)closeModal(ov.id);}));
 ['a-name','a-team'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')confirmAssign();}));
 ['b-name','b-team'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')confirmBook();}));
+document.getElementById('admin-pwd').addEventListener('keydown',e=>{if(e.key==='Enter')confirmAdmin();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&moveSource)cancelMove();});
+
+// Restore admin state on load (sessionStorage survives page reloads in the same tab)
+if(isAdmin()) document.body.classList.add('is-admin');
+updateAdminUI();
 
 // ═══════════════════════════════════════════════
 // CALENDAR PANEL (right side — all hotel bookings)
