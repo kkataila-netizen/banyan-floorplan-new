@@ -14,7 +14,10 @@ export default async (req, context) => {
     return new Response(null, { status: 204, headers: CORS });
   }
 
-  const store = getStore({ name: STORE_NAME, consistency: "strong" });
+  // Use siteID to make this a GLOBAL (site-scoped) store that persists across deploys.
+  // Without siteID, Netlify Blobs are deploy-scoped and get wiped on every new deploy.
+  const siteID = context.site.id || process.env.SITE_ID;
+  const store = getStore({ name: STORE_NAME, siteID, consistency: "strong" });
 
   // GET — return saved state (or null if none)
   if (req.method === "GET") {
