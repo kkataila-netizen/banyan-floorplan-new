@@ -182,7 +182,7 @@ body.move-mode .move-banner{display:block}
   <div class="tbar-right">
     <button class="btn btn-ghost btn-sm admin-only" onclick="exportData()">Export</button>
     <button class="btn btn-secondary btn-sm admin-only" onclick="importData()">Import</button>
-    <button class="btn btn-danger btn-sm" onclick="resetToDefault()">Reset</button>
+    <button class="btn btn-danger btn-sm admin-only" onclick="resetToDefault()">Reset</button>
   </div>
 </div>
 
@@ -580,6 +580,7 @@ function loadFromServer(){
   }).catch(()=>{/* server not available, localStorage is fine */});
 }
 function resetToDefault(){
+  if(!requireAdmin())return;
   if(!confirm('Reset all assignments to the original spreadsheet data? Bookings will be cleared.'))return;
   state={assignments:{...DEFAULT_ASSIGNMENTS},bookings:{},deskTypes:{}};
   // Restore original desk types from DESKS array defaults
@@ -732,7 +733,7 @@ function permanentHtml(d){
       <div class="occ-av">${esc(initials(asgn.name))}</div>
       <div><div class="occ-name">${esc(asgn.name)}</div><div class="occ-sub">${esc(asgn.team||'No team set')}</div></div>
     </div>
-    <div class="form-actions">
+    <div class="form-actions admin-only">
       <button class="btn btn-secondary" onclick="openAssignModal('reassign')">Reassign</button>
       <button class="btn btn-secondary" onclick="startMove('${d.id}')">Move</button>
       <button class="btn btn-danger" onclick="clearAssign('${d.id}')">Clear</button>
@@ -742,11 +743,11 @@ function permanentHtml(d){
       <div class="occ-av empty" style="font-size:18px">⊕</div>
       <div><div class="occ-name">Unassigned</div><div class="occ-sub">No one sitting here</div></div>
     </div>
-    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="openAssignModal('assign')">Assign This Desk</button>`;
+    <button class="btn btn-primary admin-only" style="width:100%;margin-top:8px" onclick="openAssignModal('assign')">Assign This Desk</button>`;
   }
   if(d.zone!=='EXEC'){
-    html+=`<div class="divider"></div>
-    <button class="btn btn-ghost" style="width:100%" onclick="convertToHotel('${d.id}')">Convert to Hotel Desk</button>`;
+    html+=`<div class="divider admin-only"></div>
+    <button class="btn btn-ghost admin-only" style="width:100%" onclick="convertToHotel('${d.id}')">Convert to Hotel Desk</button>`;
   }
   return html;
 }
@@ -784,8 +785,8 @@ function hotelHtml(d){
     });
     list+=`</div>`;
   }
-  let convertBtn=`<div class="divider"></div>
-    <button class="btn btn-ghost" style="width:100%" onclick="convertToPermanent('${d.id}')">Convert to Permanent Desk</button>`;
+  let convertBtn=`<div class="divider admin-only"></div>
+    <button class="btn btn-ghost admin-only" style="width:100%" onclick="convertToPermanent('${d.id}')">Convert to Permanent Desk</button>`;
   return`<div class="sec-title">Next 14 Days</div>${cal}<div class="divider"></div>${list}${convertBtn}`;
 }
 
@@ -793,6 +794,7 @@ function hotelHtml(d){
 // ASSIGN ACTIONS
 // ═══════════════════════════════════════════════
 function openAssignModal(mode){
+  if(!requireAdmin())return;
   pending={type:mode,deskId:selectedId};
   document.getElementById('m-assign-title').textContent=mode==='assign'?`Assign Desk ${selectedId}`:`Reassign Desk ${selectedId}`;
   const a=state.assignments[selectedId];
@@ -813,6 +815,7 @@ function confirmAssign(){
 }
 
 function clearAssign(id){
+  if(!requireAdmin())return;
   if(!confirm(`Remove assignment from desk ${id}?`))return;
   delete state.assignments[id];saveState();renderDesks();
   const d=DESKS.find(x=>x.id===id);if(d)renderSbBody(d);
@@ -823,6 +826,7 @@ function clearAssign(id){
 // CONVERT DESK TYPE
 // ═══════════════════════════════════════════════
 function convertToPermanent(id){
+  if(!requireAdmin())return;
   if(!confirm(`Convert desk ${id} from Hotel to Permanent?`))return;
   const d=DESKS.find(x=>x.id===id);if(!d)return;
   d.type=P;
@@ -837,6 +841,7 @@ function convertToPermanent(id){
 }
 
 function convertToHotel(id){
+  if(!requireAdmin())return;
   if(!confirm(`Convert desk ${id} from Permanent to Hotel?`))return;
   const d=DESKS.find(x=>x.id===id);if(!d)return;
   d.type=H;
@@ -856,6 +861,7 @@ function convertToHotel(id){
 let moveSource=null;
 
 function startMove(id){
+  if(!requireAdmin())return;
   const asgn=state.assignments[id];
   if(!asgn)return;
   moveSource=id;
