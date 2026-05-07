@@ -525,11 +525,12 @@ function requireAdmin(){
 // STATE (persisted to server-side state.json)
 // ═══════════════════════════════════════════════
 const SK = 'banyan_fp_v2';
-function defaultState(){ return {assignments:{...DEFAULT_ASSIGNMENTS}, bookings:{}, deskTypes:{}}; }
+function defaultState(){ return {assignments:{...DEFAULT_ASSIGNMENTS}, bookings:{}, deskTypes:{}, macHotels:{}}; }
 
 function ensureState(s){
   if(!s.deskTypes) s.deskTypes={};
   if(!s.bookings)  s.bookings={};
+  if(!s.macHotels) s.macHotels={};
   return s;
 }
 
@@ -582,7 +583,7 @@ function loadFromServer(){
 function resetToDefault(){
   if(!requireAdmin())return;
   if(!confirm('Reset all assignments to the original spreadsheet data? Bookings will be cleared.'))return;
-  state={assignments:{...DEFAULT_ASSIGNMENTS},bookings:{},deskTypes:{}};
+  state={assignments:{...DEFAULT_ASSIGNMENTS},bookings:{},deskTypes:{},macHotels:{}};
   // Restore original desk types from DESKS array defaults
   DESKS.forEach(d=>{const orig=d._origType;if(orig)d.type=orig;});
   saveState();renderDesks();closeSidebar();toast('Reset to default assignments');
@@ -637,8 +638,9 @@ function renderDesks(){
     g.setAttribute('data-id',d.id);
     g.addEventListener('click',()=>selectDesk(d.id));
 
+    const isMac = isHotel && state.macHotels && state.macHotels[d.id];
     const title=document.createElementNS(ns,'title');
-    title.textContent=asgn?`${d.id} — ${asgn.name}`:(isHotel?`${d.id} (hotel)`:`${d.id} (unassigned)`);
+    title.textContent=asgn?`${d.id} — ${asgn.name}`:(isHotel?`${d.id} (${isMac?'Mac ':''}hotel)`:`${d.id} (unassigned)`);
     g.appendChild(title);
 
     if(isHotel && !isExec){
@@ -658,15 +660,15 @@ function renderDesks(){
       shape.setAttribute('stroke-width',(isMoveSource||isSel)?'2.5':'1.5');
       shape.setAttribute('transform',`rotate(45 ${d.x} ${d.y})`);
       g.appendChild(shape);
-      // Add "H" label for hotel desks
+      // Add "H" (or "MH" for Mac) label for hotel desks
       const ht=document.createElementNS(ns,'text');
-      ht.setAttribute('x',d.x);ht.setAttribute('y',d.y+2.5);
+      ht.setAttribute('x',d.x);ht.setAttribute('y',d.y+(isMac?2:2.5));
       ht.setAttribute('text-anchor','middle');
       ht.setAttribute('font-family','Libre Franklin,sans-serif');
-      ht.setAttribute('font-weight','600');ht.setAttribute('font-size','6');
+      ht.setAttribute('font-weight','600');ht.setAttribute('font-size',isMac?'5':'6');
       ht.setAttribute('fill','white');
       ht.setAttribute('pointer-events','none');
-      ht.textContent='H';
+      ht.textContent=isMac?'MH':'H';
       g.appendChild(ht);
     } else {
       // Circle — white halo for contrast against floor plan image
@@ -708,9 +710,10 @@ function selectDesk(id){
   hdr.style.background='var(--moss)';
   hdr.style.color='white';
   document.getElementById('sb-id').textContent=d.zone==='EXEC'?'Private Office — '+id:'Desk '+id;
+  const isMacDesk = d.type===H && state.macHotels && state.macHotels[id];
   document.getElementById('sb-type').textContent=
     d.zone==='EXEC'?'Private Office':
-    d.type===P?'Permanent Desk':'Hotel Desk (Bookable)';
+    d.type===P?'Permanent Desk':(isMacDesk?'Mac Hotel Desk (Bookable)':'Hotel Desk (Bookable)');
   renderSbBody(d);
   document.getElementById('sidebar').classList.add('open');
 }
@@ -785,9 +788,11 @@ function hotelHtml(d){
     });
     list+=`</div>`;
   }
+  const isMac = state.macHotels && state.macHotels[d.id];
+  let macBtn=`<button class="btn btn-ghost admin-only" style="width:100%;margin-top:6px" onclick="toggleMacHotel('${d.id}')">${isMac?'✓ Mac Desk — click to unmark':'Mark as Mac Desk (MH)'}</button>`;
   let convertBtn=`<div class="divider admin-only"></div>
     <button class="btn btn-ghost admin-only" style="width:100%" onclick="convertToPermanent('${d.id}')">Convert to Permanent Desk</button>`;
-  return`<div class="sec-title">Next 14 Days</div>${cal}<div class="divider"></div>${list}${convertBtn}`;
+  return`<div class="sec-title">Next 14 Days</div>${cal}<div class="divider"></div>${list}${convertBtn}${macBtn}`;
 }
 
 // ═══════════════════════════════════════════════
@@ -853,6 +858,23 @@ function convertToHotel(id){
   document.getElementById('sb-type').textContent='Hotel Desk (Bookable)';
   renderSbBody(d);
   toast(`Desk ${id} converted to Hotel`);
+}
+
+function toggleMacHotel(id){
+  if(!requireAdmin())return;
+  if(!state.macHotels) state.macHotels={};
+  const wasMac = !!state.macHotels[id];
+  if(wasMac){ delete state.macHotels[id]; }
+  else { state.macHotels[id]=true; }
+  saveState();renderDesks();
+  // Refresh sidebar header label + body
+  const d=DESKS.find(x=>x.id===id);
+  if(d){
+    document.getElementById('sb-type').textContent = state.macHotels[id]
+      ? 'Mac Hotel Desk (Bookable)' : 'Hotel Desk (Bookable)';
+    renderSbBody(d);
+  }
+  toast(wasMac ? `Desk ${id} unmarked as Mac` : `Desk ${id} marked as Mac (MH)`);
 }
 
 // ═══════════════════════════════════════════════
@@ -979,7 +1001,7 @@ document.getElementById('search-input').addEventListener('input',function(){
 // ═══════════════════════════════════════════════
 function exportData(){
   if(!requireAdmin())return;
-  const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),assignments:state.assignments,bookings:state.bookings,deskTypes:state.deskTypes||{}},null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),assignments:state.assignments,bookings:state.bookings,deskTypes:state.deskTypes||{},macHotels:state.macHotels||{}},null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=`banyan-floorplan-${TODAY}.json`;a.click();URL.revokeObjectURL(a.href);
   toast('Exported');
@@ -1004,6 +1026,7 @@ function importData(){
             if(dd) dd.type = t==='hotel'?H:P;
           });
         }
+        if(data.macHotels)state.macHotels=data.macHotels;
         saveState();renderDesks();renderCalPanel();closeSidebar();toast('Imported successfully');
       }catch{toast('Error: invalid file');}
     };r.readAsText(f);
