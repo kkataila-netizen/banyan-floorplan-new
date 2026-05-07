@@ -177,7 +177,7 @@ body.move-mode .move-banner{display:block}
     <div class="leg-item"><div class="leg-dot" style="background:var(--moss)"></div><span>Assigned</span></div>
     <div class="leg-item"><div class="leg-dot" style="background:#fff;border:2px solid var(--moss)"></div><span>Unassigned</span></div>
     <div class="leg-item"><div class="leg-diamond" style="background:var(--sky);border:1.5px solid var(--sky-d)"></div><span>Hotel (available)</span></div>
-    <div class="leg-item"><div class="leg-diamond" style="background:var(--moss);border:1.5px solid var(--moss-d)"></div><span>Hotel (booked today)</span></div>
+    <div class="leg-item"><div class="leg-diamond" style="background:#1e4d6b;border:1.5px solid #143a52"></div><span>Hotel (booked)</span></div>
   </div>
   <div class="tbar-right">
     <button class="btn btn-ghost btn-sm admin-only" onclick="exportData()">Export</button>
@@ -625,8 +625,9 @@ function renderDesks(){
     // Unified colour scheme — no zone-based colours
     let fill,stroke;
     if(isHotel){
-      fill=ds==='booked-today'?'#395542':'#9BCBEB';
-      stroke=ds==='booked-today'?'#2d4535':'#6ba8cf';
+      // Booked hotel desks render dark blue (Hotel + Mac Hotel both)
+      fill=ds==='booked-today'?'#1e4d6b':'#9BCBEB';
+      stroke=ds==='booked-today'?'#143a52':'#6ba8cf';
     } else {
       // permanent + exec: same green palette
       fill=ds==='occupied'?'#395542':'#ffffff';
